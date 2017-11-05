@@ -23,8 +23,7 @@
             "least one second for the timestamp to counter it.")]
    [:label {:for "timestamps"} "Timestamps:"]
    [:textarea#timestamps
-    {:cols 60
-     :onChange #(reset! timestamps (-> % .-target .-value))}]
+    {:onChange #(reset! timestamps (-> % .-target .-value))}]
    [:button
     {:onClick #(reset! splitted-videos (parse-timestamps @timestamps))}
     "Decompile"]])
