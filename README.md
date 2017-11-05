@@ -4,7 +4,7 @@ Decompile/split long Youtube videos using timestamps from comment.
 
 ## See it live
 
-[youtube-decompile](https://www.burhanloey.com/youtube-decompile)
+[youtube-decompile](https://www.burhanloey.com/youtube-decompile/)
 
 ## License
 
