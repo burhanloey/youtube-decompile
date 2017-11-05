@@ -13,9 +13,8 @@
   [:div
    [:label {:for "youtube-url"} "Youtube URL: "]
    [:input#youtube-url
-    {:size 50
+    {:type "text"
      :onChange #(reset! youtube-url (-> % .-target .-value))}]
-   [:br]
    [:p (str "Youtube text has some problem with line break during copy "
             "pasting. To get them working properly, select all the "
             "comment box including the author informations.")]
@@ -23,12 +22,9 @@
             "it will start from the last point you stopped. Put at "
             "least one second for the timestamp to counter it.")]
    [:label {:for "timestamps"} "Timestamps:"]
-   [:br]
    [:textarea#timestamps
-    {:rows 10 :cols 67
+    {:cols 60
      :onChange #(reset! timestamps (-> % .-target .-value))}]
-   [:br]
-   [:br]
    [:button
     {:onClick #(reset! splitted-videos (parse-timestamps @timestamps))}
     "Decompile"]])
@@ -40,8 +36,10 @@
      [:h3
       title
       " "  ; some blank between the title and the buttons
-      [:button {:onClick #(reset! display-video? true)} "play"]
-      [:button {:onClick #(reset! display-video? false)} "close"]]
+      [:button.button-outline
+       {:onClick #(reset! display-video? true)} "play"]
+      [:button.button-clear
+       {:onClick #(reset! display-video? false)} "close"]]
      (when @display-video?
        [:iframe {:width 560 :height 315
                  :src (str "https://www.youtube.com/embed/"
@@ -56,9 +54,11 @@
          (rum/with-key start)))])
 
 (rum/defc app []
-  [:div
-   (inputs)
-   (outputs)])
+  [:div.container
+   [:div.row
+    [:div {:class "column"}
+     (inputs)
+     (outputs)]]])
 
 (rum/mount (app) (js/document.getElementById "app"))
 

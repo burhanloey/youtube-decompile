@@ -1,7 +1,4 @@
-p {
-    width: 497px;
-}
-
 textarea {
     resize: none;
+    height: 150px;
 }
