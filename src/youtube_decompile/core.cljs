@@ -55,7 +55,7 @@
 (rum/defc app []
   [:div.container
    [:div.row
-    [:div {:class "column"}
+    [:div.column
      (inputs)
      (outputs)]]])
 
