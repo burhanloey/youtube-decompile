@@ -1,5 +1,6 @@
 (ns youtube-decompile.core
   (:require [rum.core :as rum]
+            [youtube-decompile.mixins :refer [loop-video]]
             [youtube-decompile.utils :refer [parse-timestamps
                                              parse-video-id]]))
 
@@ -28,25 +29,37 @@
     {:onClick #(reset! splitted-videos (parse-timestamps @timestamps))}
     "Decompile"]])
 
+(rum/defc video-frame < loop-video
+  [{:keys [start end repeat]}]
+  [:iframe {:id (str "iframe-" start)
+            :width 560 :height 315
+            :src (str "https://www.youtube.com/embed/"
+                      (parse-video-id @youtube-url)
+                      "?start=" start "&end=" end "&enablejsapi=1")
+            :frameBorder 0 :allowFullScreen true}])
+
 (rum/defcs splitted-video-item < (rum/local false ::display-video)
-  [state {:keys [title start end]}]
-  (let [display-video? (::display-video state)]
+                               < (rum/local false ::repeat-video)
+  [state {:keys [title start end] :as data}]
+  (let [display-video? (::display-video state)
+        repeat-video? (::repeat-video state)]
     [:div
      [:h3
       title
-      " "  ; some blank between the title and the buttons
+      [:button
+       {:style {:margin "0 7px"}
+        :onClick #(reset! display-video? true)} "play"]
       [:button.button-outline
-       {:onClick #(reset! display-video? true)} "play"]
+       {:onClick #(swap! repeat-video? not)}
+       (if @repeat-video?
+         "repeat: yes"
+         "repeat: no")]
       [:button.button-clear
        {:onClick #(reset! display-video? false)} "close"]]
      (when @display-video?
-       [:iframe {:width 560 :height 315
-                 :src (str "https://www.youtube.com/embed/"
-                           (parse-video-id @youtube-url)
-                           "?start=" start "&end=" end)
-                 :frameBorder 0 :allowFullScreen true}])]))
+       (video-frame (assoc data :repeat repeat-video?)))]))
 
-(rum/defcs outputs < rum/reactive [state]
+(rum/defc outputs < rum/reactive []
   [:div
    (for [{:keys [start] :as splitted-data} (rum/react splitted-videos)]
      (-> (splitted-video-item splitted-data)
