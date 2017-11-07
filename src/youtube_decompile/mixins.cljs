@@ -1,8 +1,5 @@
 (ns youtube-decompile.mixins)
 
-(def YTPlayer      (aget js/YT "Player"))
-(def +ended-state+ (aget js/YT "PlayerState" "ENDED"))
-
 (def loop-video
   ;; A mixin to loop YouTube video when :repeat state is set to true.
   {:did-mount
@@ -13,9 +10,9 @@
                     (aget "id"))
            play (fn [evt] (-> evt .-target .playVideo))
            loop (fn [evt]
-                  (when (and (= (-> evt .-data) +ended-state+)
+                  (when (and (= (-> evt .-data) js/YT.PlayerState.ENDED)
                              @repeat)
                     (-> evt .-target (.seekTo start))))]
-       (YTPlayer. id #js {:events #js {:onReady       play
-                                       :onStateChange loop}}))
+       (js/YT.Player. id #js {:events #js {:onReady       play
+                                           :onStateChange loop}}))
      state)})
