@@ -31,6 +31,7 @@
                {:id "min"
                 :source-paths ["src"]
                 :compiler {:output-to "resources/public/js/compiled/youtube_decompile.js"
+                           :externs ["youtube-iframe-api-externs.js"]
                            :main youtube-decompile.core
                            :optimizations :advanced
                            :pretty-print false}}]}
