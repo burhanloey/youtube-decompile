@@ -1,6 +1,6 @@
 # youtube-decompile
 
-Decompile/split long Youtube videos using timestamps from comment.
+Decompile/split long YouTube videos using timestamps from comment.
 
 ## See it live
 
