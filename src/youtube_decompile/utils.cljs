@@ -28,16 +28,20 @@
   [line]
   (first (last (re-seq timestamp-regex line))))
 
+(defn count'
+  "Count timestamps using :using function."
+  [timestamps & {:keys [using]}]
+  (->> timestamps
+       (filter second)
+       (filter #(apply using %))
+       count))
+
 (defn where-is-timestamp?
   "Check whether the timestamps are on right side. Check by majority. lefties
   and righties are lists of tuple(stack,needle). Returns selected parameter."
-  [& {:keys [lefties righties]}]
-  (let [lefties-count  (->> lefties
-                            (filter #(apply string/starts-with? %))
-                            count)
-        righties-count (->> righties
-                            (filter #(apply string/ends-with? %))
-                            count)]
+  [lefties & {righties :or}]
+  (let [lefties-count  (count' lefties :using string/starts-with?)
+        righties-count (count' righties :using string/ends-with?)]
     (if (> righties-count lefties-count)
       righties
       lefties)))
@@ -45,15 +49,13 @@
 (defn lookup-timestamp
   "Lookup timestamp from string."
   [lines]
-  (let [lefties  (->> lines
-                      (map #(vector % (first-timestamp %)))
-                      (filter second))
-        righties (->> lines
-                      (map #(vector % (last-timestamp %)))
-                      (filter second))
-        selected (where-is-timestamp? :lefties lefties
-                                      :righties righties)]
-    (map second selected)))
+  (let [lefties  (map #(vector % (first-timestamp %)) lines)
+        righties (map #(vector % (last-timestamp %)) lines)
+        selected (where-is-timestamp? lefties :or righties)]
+    (->> selected
+         (map second)
+         (map vector lines)
+         (filter second))))
 
 (defn parse-timestamps
   "Parse the inputs of timestamps.
@@ -61,18 +63,14 @@
   Return a list of :title, :start, and :end map."
   [timestamps]
   (let [lines            (string/split timestamps #"\n")
-        starts           (lookup-timestamp lines)
-        ends             (as-> (filter identity starts) %
+        starts           (lookup-timestamp lines) ; actually [title start]
+        ends             (as-> starts %
+                           (map second %)
                            (drop 1 %)
                            (vec %)
                            (conj % nil)) ; nil = until the end of video
-        lines-and-starts (->> (map vector lines starts)
-                              (filter second))]
-    (js/console.log (cljs.pprint/pprint (->> (map conj lines-and-starts ends)
-                                             (map #(hash-map :title (first %)
-                                                             :start (to-seconds (second %))
-                                                             :end   (dec (to-seconds (last %))))))))
-    (->> (map conj lines-and-starts ends)
+        ]
+    (->> (map conj starts ends)
          (map #(hash-map :title (first %)
                          :start (to-seconds (second %))
                          :end   (dec (to-seconds (last %))))))))
