@@ -65,9 +65,10 @@
         starts           (lookup-timestamp lines)
         lines-and-starts (->>  (map vector lines starts) ; remove nil only after
                                (filter second))          ; assoc w/ its origin line
-        ends             (-> (drop 1 starts)
-                             vec
-                             (conj nil)) ; nil = until the end of video
+        ends             (as-> (filter identity starts) %
+                           (drop 1 %)
+                           (vec %)
+                           (conj % nil)) ; nil = until the end of video
         ]
     (->> (map conj lines-and-starts ends)
          (map #(hash-map :title (first %)
