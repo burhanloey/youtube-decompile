@@ -63,7 +63,7 @@
   [timestamps]
   (let [lines            (string/split timestamps #"\n")
         starts           (lookup-timestamp lines)
-        lines-and-starts (->>  (map vector lines starts) ; filter nil only after
+        lines-and-starts (->>  (map vector lines starts) ; remove nil only after
                                (filter second))          ; assoc w/ its origin line
         ends             (-> (drop 1 starts)
                              vec
