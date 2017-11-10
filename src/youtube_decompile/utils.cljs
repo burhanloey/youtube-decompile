@@ -29,7 +29,8 @@
   (first (last (re-seq timestamp-regex line))))
 
 (defn count'
-  "Count timestamps using :using function."
+  "Count timestamps using :using function. timestamps is a list of
+  tuple(line, timestamp) like tuple(stack, needle)."
   [timestamps & {:keys [using]}]
   (->> timestamps
        (filter second)
@@ -38,7 +39,8 @@
 
 (defn where-is-timestamp?
   "Check whether the timestamps are on right side. Check by majority. lefties
-  and righties are lists of tuple(stack,needle). Returns selected parameter."
+  and righties are lists of tuple(line, timestamp) like tuple(stack,needle).
+  Returns selected parameter."
   [lefties & {righties :or}]
   (let [lefties-count  (count' lefties :using string/starts-with?)
         righties-count (count' righties :using string/ends-with?)]
@@ -52,10 +54,7 @@
   (let [lefties  (map #(vector % (first-timestamp %)) lines)
         righties (map #(vector % (last-timestamp %)) lines)
         selected (where-is-timestamp? lefties :or righties)]
-    (->> selected
-         (map second)
-         (map vector lines)
-         (filter second))))
+    (map second selected)))
 
 (defn parse-timestamps
   "Parse the inputs of timestamps.
@@ -63,14 +62,14 @@
   Return a list of :title, :start, and :end map."
   [timestamps]
   (let [lines            (string/split timestamps #"\n")
-        starts           (lookup-timestamp lines) ; actually [title start]
-        ends             (as-> starts %
-                           (map second %)
-                           (drop 1 %)
-                           (vec %)
-                           (conj % nil)) ; nil = until the end of video
+        starts           (lookup-timestamp lines)
+        lines-and-starts (->>  (map vector lines starts) ; filter nil only after
+                               (filter second))          ; assoc w/ its origin line
+        ends             (-> (drop 1 starts)
+                             vec
+                             (conj nil)) ; nil = until the end of video
         ]
-    (->> (map conj starts ends)
+    (->> (map conj lines-and-starts ends)
          (map #(hash-map :title (first %)
                          :start (to-seconds (second %))
                          :end   (dec (to-seconds (last %))))))))
