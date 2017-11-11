@@ -51,7 +51,7 @@
    (decompile-button)])
 
 (rum/defc video-frame < loop-video
-  [{:keys [start end repeat]}]
+  [_ {:keys [start end]}]
   (let [start' (if (and (zero? start) @force-at-zero?) 1 start)]
     [:iframe {:id (str "iframe-" start)
               :width 560 :height 315
@@ -78,7 +78,7 @@
       [:button.button-clear
        {:onClick #(reset! display-video? false)} "close"]]
      (when @display-video?
-       (video-frame (assoc data :repeat repeat-video?)))]))
+       (video-frame {:repeat repeat-video?} data))]))
 
 (rum/defc outputs < rum/reactive []
   [:div

@@ -4,7 +4,8 @@
   ;; A mixin to loop YouTube video when :repeat state is set to true.
   {:did-mount
    (fn [state]
-     (let [[{:keys [start repeat]}] (:rum/args state)
+     (let [[{:keys [repeat]}
+            {:keys [start]}] (:rum/args state)
            id   (-> (:rum/react-component state)
                     js/ReactDOM.findDOMNode
                     (aget "id"))
