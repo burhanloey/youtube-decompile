@@ -76,6 +76,6 @@
                          :end   (dec (to-seconds (last %))))))))
 
 (defn parse-video-id
-  "Parse Youtube video id from url."
+  "Parse YouTube video id from url."
   [url]
   (second (re-find #"v=([^&]*)" url)))

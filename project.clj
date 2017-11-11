@@ -1,5 +1,5 @@
 (defproject youtube-decompile "0.1.0-SNAPSHOT"
-  :description "Decompile/split long Youtube videos using timestamps from comment."
+  :description "Decompile/split long YouTube videos using timestamps from comment."
   :url "https://github.com/burhanloey/youtube-decompile"
   :license {:name "MIT License"
             :url "https://opensource.org/licenses/MIT"}

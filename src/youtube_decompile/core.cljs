@@ -12,11 +12,11 @@
 
 (rum/defc inputs []
   [:div
-   [:label {:for "youtube-url"} "Youtube URL: "]
+   [:label {:for "youtube-url"} "YouTube URL: "]
    [:input#youtube-url
     {:type "text"
      :onChange #(reset! youtube-url (-> % .-target .-value))}]
-   [:p (str "Youtube text has some problem with line break during copy "
+   [:p (str "YouTube text has some problem with line break during copy "
             "pasting. To get them working properly, select all the "
             "comment box including the author informations.")]
    [:p (str "Also, when the timestamp is 0 seconds, "
