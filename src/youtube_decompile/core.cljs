@@ -4,45 +4,68 @@
             [youtube-decompile.utils :refer [parse-timestamps
                                              parse-video-id]]))
 
-(defonce app-state (atom {}))
+(defonce app-state (atom {:force-at-zero true}))
 
 (def youtube-url     (rum/cursor-in app-state [:youtube-url]))
 (def timestamps      (rum/cursor-in app-state [:timestamps]))
 (def splitted-videos (rum/cursor-in app-state [:splitted-videos]))
+(def force-at-zero?  (rum/cursor-in app-state [:force-at-zero]))
 
-(rum/defc inputs []
+(rum/defc youtube-url-input []
   [:div
    [:label {:for "youtube-url"} "YouTube URL: "]
    [:input#youtube-url
     {:type "text"
-     :onChange #(reset! youtube-url (-> % .-target .-value))}]
-   [:p (str "YouTube text has some problem with line break during copy "
-            "pasting. To get them working properly, select all the "
-            "comment box including the author informations.")]
-   [:p (str "Also, when the timestamp is 0 seconds, "
-            "it will start from the last point you stopped. Put at "
-            "least one second for the timestamp to counter it.")]
+     :onChange #(reset! youtube-url (-> % .-target .-value))}]])
+
+(rum/defc guide-text []
+  [:p (str "YouTube text has some problem with line break during copy "
+           "pasting. To get them working properly, select all the "
+           "comment box including the author informations.")])
+
+(rum/defc force-at-zero-button < rum/reactive []
+  (let [text (if (rum/react force-at-zero?) "Yes" "No")]
+    [:div.row
+     [:div.column
+      [:button.button-outline
+       {:onClick #(swap! force-at-zero? not)}
+       (str "Force video to start from beginning: " text)]]]))
+
+(rum/defc timestamps-input []
+  [:div
    [:label {:for "timestamps"} "Timestamps:"]
    [:textarea#timestamps
-    {:onChange #(reset! timestamps (-> % .-target .-value))}]
-   [:button
-    {:onClick #(reset! splitted-videos (parse-timestamps @timestamps))}
-    "Decompile"]])
+    {:onChange #(reset! timestamps (-> % .-target .-value))}]])
+
+(rum/defc decompile-button []
+  [:button
+   {:onClick #(reset! splitted-videos (parse-timestamps @timestamps))}
+   "Decompile"])
+
+(rum/defc inputs []
+  [:div
+   (youtube-url-input)
+   (guide-text)
+   (timestamps-input)
+   (force-at-zero-button)
+   (decompile-button)])
 
 (rum/defc video-frame < loop-video
   [{:keys [start end repeat]}]
-  [:iframe {:id (str "iframe-" start)
-            :width 560 :height 315
-            :src (str "https://www.youtube.com/embed/"
-                      (parse-video-id @youtube-url)
-                      "?start=" start "&end=" end "&enablejsapi=1")
-            :frameBorder 0 :allowFullScreen true}])
+  (let [start' (if (and (zero? start) @force-at-zero?) 1 start)]
+    [:iframe {:id (str "iframe-" start)
+              :width 560 :height 315
+              :src (str "https://www.youtube.com/embed/"
+                        (parse-video-id @youtube-url)
+                        "?start=" start' "&end=" end "&enablejsapi=1")
+              :frameBorder 0 :allowFullScreen true}]))
 
 (rum/defcs splitted-video-item < (rum/local false ::display-video)
                                < (rum/local false ::repeat-video)
   [state {:keys [title start end] :as data}]
   (let [display-video? (::display-video state)
-        repeat-video? (::repeat-video state)]
+        repeat-video? (::repeat-video state)
+        repeat-text (if @repeat-video? "repeat: yes" "repeat: no")]
     [:div
      [:h3
       title
@@ -51,9 +74,7 @@
         :onClick #(reset! display-video? true)} "play"]
       [:button.button-outline
        {:onClick #(swap! repeat-video? not)}
-       (if @repeat-video?
-         "repeat: yes"
-         "repeat: no")]
+       repeat-text]
       [:button.button-clear
        {:onClick #(reset! display-video? false)} "close"]]
      (when @display-video?
