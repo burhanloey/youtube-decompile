@@ -5,7 +5,7 @@
 
 (rum/defc youtube-url-input []
   [:div
-   [:label {:for "youtube-url"} "YouTube URL: "]
+   [:label {:for "youtube-url"} "YouTube URL:"]
    [:input#youtube-url
     {:type "text"
      :onChange #(reset! state/youtube-url (-> % .-target .-value))}]])
