@@ -12,11 +12,6 @@
      :onChange #(reset! state/youtube-url (-> % .-target .-value))
      :value (rum/react state/youtube-url)}]])
 
-(rum/defc guide-text []
-  [:p (str "YouTube text has some problem with line break during copy "
-           "pasting. To get them working properly, select all the "
-           "comment box including the author informations.")])
-
 (rum/defc force-at-zero-button < rum/reactive []
   (let [text (if (rum/react state/force-at-zero?) "Yes" "No")]
     [:div.row
@@ -43,7 +38,6 @@
 (rum/defc inputs []
   [:div
    (youtube-url-input)
-   (guide-text)
    (timestamps-input)
    (force-at-zero-button)
    (decompile-button)])

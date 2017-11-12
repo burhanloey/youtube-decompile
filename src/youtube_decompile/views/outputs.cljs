@@ -33,16 +33,18 @@
                                < (rum/local false ::repeat-video)
   [state {:keys [title start end] :as data}]
   [:div
-   [:h3
-    title
+   [:h4 title]
+   [:div
     (play-button {:display-video (::display-video state)})
     (repeat-button {:repeat-video (::repeat-video state)})
     (close-button {:display-video (::display-video state)})]
    (when @(::display-video state)
-     (video-frame {:repeat (::repeat-video state)} data))])
+     (video-frame {:repeat (::repeat-video state)} data))
+   [:hr]])
 
 (rum/defc outputs < rum/reactive []
   [:div
+   [:label "Splitted videos:"]
    (for [{:keys [start] :as splitted-data} (rum/react state/splitted-videos)]
      (-> (splitted-video-item splitted-data)
          (rum/with-key start)))])
