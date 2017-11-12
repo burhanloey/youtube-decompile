@@ -1,7 +1,9 @@
 (ns youtube-decompile.app-state
   (:require [rum.core :as rum]))
 
-(defonce app-state (atom {:force-at-zero true}))
+(defonce app-state (atom {:youtube-url ""
+                          :timestamps ""
+                          :force-at-zero true}))
 
 (def youtube-url     (rum/cursor-in app-state [:youtube-url]))
 (def timestamps      (rum/cursor-in app-state [:timestamps]))

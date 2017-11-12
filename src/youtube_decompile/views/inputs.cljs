@@ -1,5 +1,6 @@
 (ns youtube-decompile.views.inputs
   (:require [rum.core :as rum]
+            [youtube-decompile.routes :as routes]
             [youtube-decompile.app-state :as state]
             [youtube-decompile.utils :refer [parse-timestamps]]))
 
@@ -31,10 +32,13 @@
     {:onChange #(reset! state/timestamps (-> % .-target .-value))
      :value (rum/react state/timestamps)}]])
 
-(rum/defc decompile-button []
-  [:button
-   {:onClick #(reset! state/splitted-videos (parse-timestamps @state/timestamps))}
-   "Decompile"])
+(rum/defc decompile-button < rum/reactive []
+  (let [current-state (rum/react state/app-state)]
+    [:a.button
+     {:href (routes/decompile
+             {:query-params (select-keys current-state [:youtube-url
+                                                        :timestamps])})}
+     "Decompile"]))
 
 (rum/defc inputs []
   [:div
