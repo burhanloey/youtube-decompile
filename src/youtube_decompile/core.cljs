@@ -12,10 +12,10 @@
    [:div.row
     (contents)]
    [:div.row
-    [:div.column {:class "column-40"}
-     (inputs)]
-    [:div.column {:class "column-60"}
-     (outputs)]]])
+    [:div.pure-u-md-2-5
+     [:div.column (inputs)]]
+    [:div.pure-u-md-3-5
+     [:div.column (outputs)]]]])
 
 (rum/mount (app) (js/document.getElementById "app"))
 
