@@ -3,20 +3,31 @@
 
 (def timestamp-regex #"(?:(?:([01]?\d|2[0-3]):)?([0-5]?\d):)?([0-5]?\d)")
 
-(defn to-seconds
+(defmulti to-seconds
   "Convert timestamp string to seconds."
-  [timestamp]
-  (let [colon-count (get (frequencies timestamp) ":")]
-    (case colon-count
-      2 (let [[hour minute second] (string/split timestamp #":")]
-          (+ (* (js/parseInt hour) 3600)
-             (* (js/parseInt minute) 60)
-             (js/parseInt second)))
-      1 (let [[minute second] (string/split timestamp #":")]
-          (+ (* (js/parseInt minute) 60)
-             (js/parseInt second)))
-      0 (js/parseInt timestamp)
+  (fn [timestamp]
+    (case (get (frequencies timestamp) ":")
+      2 :hh-mm-ss
+      1 :mm-ss
+      0 :ss
       nil)))
+
+(defmethod to-seconds :hh-mm-ss [timestamp]
+  (let [[hour minute second] (string/split timestamp #":")]
+    (+ (* (js/parseInt hour) 3600)
+       (* (js/parseInt minute) 60)
+       (js/parseInt second))))
+
+(defmethod to-seconds :mm-ss [timestamp]
+  (let [[minute second] (string/split timestamp #":")]
+    (+ (* (js/parseInt minute) 60)
+       (js/parseInt second))))
+
+(defmethod to-seconds :ss [timestamp]
+  (js/parseInt timestamp))
+
+(defmethod to-seconds :default [_]
+  nil)
 
 (defn first-timestamp
   "Get first matched timestamp from string."
