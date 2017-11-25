@@ -2,7 +2,7 @@
   (:require [rum.core :as rum]
             [youtube-decompile.app-state :as state]
             [youtube-decompile.mixins :refer [loop-video]]
-            [youtube-decompile.utils :refer [parse-video-id]]))
+            [youtube-decompile.parsers :refer [parse-video-id]]))
 
 (rum/defc play-button [{:keys [display-video]}]
   [:button
@@ -45,6 +45,6 @@
 (rum/defc outputs < rum/reactive []
   [:div
    [:label "Splitted videos:"]
-   (for [{:keys [start] :as splitted-data} (rum/react state/splitted-videos)]
+   (for [{:keys [title] :as splitted-data} (rum/react state/splitted-videos)]
      (-> (splitted-video-item splitted-data)
-         (rum/with-key start)))])
+         (rum/with-key title)))])
