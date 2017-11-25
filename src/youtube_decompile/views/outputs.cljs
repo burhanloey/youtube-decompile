@@ -1,5 +1,6 @@
 (ns youtube-decompile.views.outputs
-  (:require [rum.core :as rum]
+  (:require [clojure.string :as string]
+            [rum.core :as rum]
             [youtube-decompile.app-state :as state]
             [youtube-decompile.mixins :refer [loop-video]]
             [youtube-decompile.parsers :refer [parse-video-id]]))
@@ -42,9 +43,25 @@
      (video-frame {:repeat (::repeat-video state)} data))
    [:hr]])
 
-(rum/defc outputs < rum/reactive []
-  [:div
-   [:label "Splitted videos:"]
-   (for [{:keys [title] :as splitted-data} (rum/react state/splitted-videos)]
-     (-> (splitted-video-item splitted-data)
-         (rum/with-key title)))])
+(defn match-title
+  "Returns a function to check whether title contains search-string."
+  [search-string]
+  (fn [{:keys [title]}]
+    (re-find (re-pattern search-string) title)))
+
+(rum/defcs outputs < rum/reactive
+                   < (rum/local "" ::filter)
+  [state]
+  (let [search-string (::filter state)
+        splitted-data (rum/react state/splitted-videos)
+        filtered-data (if (string/blank? @search-string)
+                        splitted-data
+                        (filter (match-title @search-string) splitted-data))]
+    [:div
+     [:div.row
+      [:label.column "Splitted videos:"]
+      [:input.column {:type "text" :placeholder "Search..."
+                      :onChange #(reset! search-string (-> % .-target .-value))}]]
+     (for [{:keys [title] :as data} filtered-data]
+       (-> (splitted-video-item data)
+           (rum/with-key title)))]))
