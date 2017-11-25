@@ -44,10 +44,11 @@
    [:hr]])
 
 (defn match-title
-  "Returns a function to check whether title contains search-string."
+  "Returns a function to check whether title contains search-string. Regex is
+  case-insensitive."
   [search-string]
   (fn [{:keys [title]}]
-    (re-find (re-pattern search-string) title)))
+    (re-find (re-pattern (str "(?i)" search-string)) title)))
 
 (rum/defcs outputs < rum/reactive
                    < (rum/local "" ::filter)
