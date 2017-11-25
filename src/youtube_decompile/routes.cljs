@@ -1,6 +1,6 @@
 (ns youtube-decompile.routes
   (:require [youtube-decompile.app-state :as state]
-            [youtube-decompile.utils :refer [parse-timestamps]]
+            [youtube-decompile.parsers :refer [parse-timestamps]]
             [secretary.core :as secretary :refer-macros [defroute]]
             [goog.events :as events]
             [goog.history.EventType :as EventType])

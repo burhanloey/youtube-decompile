@@ -2,7 +2,7 @@
   (:require [rum.core :as rum]
             [youtube-decompile.app-state :as state]
             [youtube-decompile.mixins :refer [loop-video]]
-            [youtube-decompile.utils :refer [parse-video-id]]))
+            [youtube-decompile.parsers :refer [parse-video-id]]))
 
 (rum/defc play-button [{:keys [display-video]}]
   [:button

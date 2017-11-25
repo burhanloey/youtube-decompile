@@ -1,8 +1,7 @@
 (ns youtube-decompile.views.inputs
   (:require [rum.core :as rum]
             [youtube-decompile.routes :as routes]
-            [youtube-decompile.app-state :as state]
-            [youtube-decompile.utils :refer [parse-timestamps]]))
+            [youtube-decompile.app-state :as state]))
 
 (rum/defc youtube-url-input < rum/reactive []
   [:div
