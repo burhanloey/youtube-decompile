@@ -39,41 +39,22 @@
   [line]
   (first (last (re-seq timestamp-regex line))))
 
-(defn count'
-  "Count timestamps using :using function. timestamps is a list of
-  tuple(line, timestamp) like tuple(stack, needle)."
-  [timestamps & {:keys [using]}]
-  (->> timestamps
-       (filter second)
-       (filter #(apply using %))
-       count))
-
-(defn where-is-timestamp?
-  "Check whether the timestamps are on right side. Check by majority. lefties
-  and righties are lists of tuple(line, timestamp) like tuple(stack,needle).
-  Returns selected parameter."
-  [lefties & {righties :or}]
-  (let [lefties-count  (count' lefties :using string/starts-with?)
-        righties-count (count' righties :using string/ends-with?)]
-    (if (> righties-count lefties-count)
-      righties
-      lefties)))
-
 (defn lookup-timestamp
   "Lookup timestamp from string."
-  [lines]
-  (let [lefties  (map #(vector % (first-timestamp %)) lines)
-        righties (map #(vector % (last-timestamp %)) lines)
-        selected (where-is-timestamp? lefties :or righties)]
-    (map second selected)))
+  [& {:keys [lines timestamp-location]}]
+  (let [lookup-fn (if (= timestamp-location "right")
+                    last-timestamp
+                    first-timestamp)]
+    (map lookup-fn lines)))
 
 (defn parse-timestamps
   "Parse the inputs of timestamps.
 
   Return a list of :title, :start, and :end map."
-  [timestamps]
+  [{:keys [timestamps timestamp-location]}]
   (let [lines            (string/split timestamps #"\n")
-        starts           (lookup-timestamp lines)
+        starts           (lookup-timestamp :lines lines
+                                           :timestamp-location timestamp-location)
         lines-and-starts (->>  (map vector lines starts) ; remove nil only after
                                (filter second))          ; assoc w/ its origin line
         ends             (as-> (filter identity starts) %

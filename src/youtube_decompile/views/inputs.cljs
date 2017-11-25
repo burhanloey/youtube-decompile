@@ -12,6 +12,17 @@
      :onChange #(reset! state/youtube-url (-> % .-target .-value))
      :value (rum/react state/youtube-url)}]])
 
+(defn swap-location [current-text]
+  (if (= current-text "left")
+    "right"
+    "left"))
+
+(rum/defc timestamp-location-button < rum/reactive []
+  (let [text (rum/react state/timestamp-location)]
+    [:button.button-outline
+     {:onClick #(swap! state/timestamp-location swap-location)}
+     (str "Timestamp location: " text)]))
+
 (rum/defc force-at-zero-button < rum/reactive []
   (let [text (if (rum/react state/force-at-zero?) "Yes" "No")]
     [:div.row
@@ -32,12 +43,14 @@
     [:a.button
      {:href (routes/decompile
              {:query-params (select-keys current-state [:youtube-url
-                                                        :timestamps])})}
+                                                        :timestamps
+                                                        :timestamp-location])})}
      "Decompile"]))
 
 (rum/defc inputs []
   [:div
    (youtube-url-input)
    (timestamps-input)
+   (timestamp-location-button)
    (force-at-zero-button)
    (decompile-button)])

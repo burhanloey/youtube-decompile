@@ -45,6 +45,6 @@
 (rum/defc outputs < rum/reactive []
   [:div
    [:label "Splitted videos:"]
-   (for [{:keys [start] :as splitted-data} (rum/react state/splitted-videos)]
+   (for [{:keys [title] :as splitted-data} (rum/react state/splitted-videos)]
      (-> (splitted-video-item splitted-data)
-         (rum/with-key start)))])
+         (rum/with-key title)))])

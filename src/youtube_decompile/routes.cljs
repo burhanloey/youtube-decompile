@@ -10,7 +10,7 @@
 
 (defroute decompile "/splitting" [query-params]
   (swap! state/app-state merge query-params)
-  (reset! state/splitted-videos (parse-timestamps @state/timestamps)))
+  (reset! state/splitted-videos (parse-timestamps @state/app-state)))
 
 (defn hook-browser-navigation! []
   (let [h (History.)]
